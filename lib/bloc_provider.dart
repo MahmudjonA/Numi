@@ -1,0 +1,26 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:numi/features/home/presentation/bloc/meal/meal_bloc.dart';
+
+import 'core/di/service_locator.dart';
+import 'features/home/presentation/bloc/food_prediction/food_prediction_bloc.dart';
+
+class MyBlocProvider extends StatelessWidget {
+  const MyBlocProvider({super.key, required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        //* Auth
+        BlocProvider<FoodPredictionBloc>(
+          create: (context) => sl<FoodPredictionBloc>(),
+        ),
+        BlocProvider<MealBloc>(create: (context) => sl<MealBloc>()),
+      ],
+      child: child,
+    );
+  }
+}
