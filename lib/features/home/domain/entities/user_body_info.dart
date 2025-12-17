@@ -1,14 +1,14 @@
 enum Gender {
-  male,
-  female,
+  Male,
+  Female,
 }
 
 enum ActivityLevel {
-  sedentary,
-  light,
-  moderate,
-  active,
-  veryActive,
+  Sedentary,
+  Light,
+  Moderate,
+  Active,
+  VeryActive,
 }
 
 class UserBodyInfo {

@@ -6,7 +6,7 @@ class GetUserBodyInfoUseCase {
 
   GetUserBodyInfoUseCase(this.userBodyRepo);
 
-  Future<UserBodyInfo> call() {
+  Future<UserBodyInfo?> call() {
     return userBodyRepo.getUserBodyInfo();
   }
 }

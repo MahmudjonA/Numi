@@ -1,7 +1,7 @@
 import 'package:hive/hive.dart';
 import '../../domain/entities/meal.dart';
-
 part 'meal_model.g.dart';
+
 @HiveType(typeId: 0)
 class MealModel extends HiveObject {
   @HiveField(0)

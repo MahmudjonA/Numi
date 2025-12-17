@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:numi/core/widgets/padding_wg.dart';
+import 'package:numi/features/home/presentation/pages/daily_calories_page.dart';
 import 'package:numi/features/home/presentation/widgets/app_bar_wg.dart';
 import 'package:numi/features/home/presentation/widgets/banners_wg.dart';
 import 'package:numi/features/home/presentation/widgets/categories_wg.dart';
 import 'package:numi/features/home/presentation/widgets/last_meal_wg.dart';
+import '../../domain/use_cases/group_meals_by_day_use_case.dart';
 import '../bloc/food_prediction/food_prediction_bloc.dart';
 import '../bloc/food_prediction/food_prediction_state.dart';
 import '../bloc/meal/meal_bloc.dart';
@@ -55,7 +57,18 @@ class HomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DailyCaloriesCard(onPress: () {}),
+              DailyCaloriesCard(
+                onPress: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) {
+                        return const DailyCaloriesPage();
+                      },
+                    ),
+                  );
+                },
+              ),
               SizedBox(height: 20.h),
               BannersWg(),
               SizedBox(height: 15.h),
@@ -85,7 +98,16 @@ class HomePage extends StatelessWidget {
                   }
 
                   if (state is MealLoaded) {
-                    return LastMealWg(meals: state.meals);
+                    final groupMealsByDay = GroupMealsByDayUseCase();
+                    final grouped = groupMealsByDay(state.meals);
+                    final today = DateTime.now();
+                    final todayKey = DateTime(
+                      today.year,
+                      today.month,
+                      today.day,
+                    );
+
+                    return LastMealWg(meals: grouped[todayKey] ?? []);
                   }
                   return SizedBox();
                 },

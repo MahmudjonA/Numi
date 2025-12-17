@@ -1,7 +1,7 @@
 import 'package:numi/features/home/domain/entities/user_body_info.dart';
 
 abstract class UserBodyRepo {
-  Future<UserBodyInfo> getUserBodyInfo();
+  Future<UserBodyInfo?> getUserBodyInfo();
 
-  Future<void> updateUserBodyInfo({required UserBodyInfo userBodyInfo});
+  Future<void> saveUserBodyInfo({required UserBodyInfo userBodyInfo});
 }
