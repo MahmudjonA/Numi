@@ -52,14 +52,15 @@ class _NumiBottomNavState extends State<NumiBottomNav> {
         width: 70,
         child: FloatingActionButton(
           onPressed: _openCamera,
-          backgroundColor: Colors.blue,
+          backgroundColor: Theme.of(context).colorScheme.primary,
           elevation: 6,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(50),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.camera_alt_rounded,
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onPrimary,
+
             size: 32,
           ),
         ),
@@ -68,7 +69,7 @@ class _NumiBottomNavState extends State<NumiBottomNav> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
 
       bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surface,
         shape: const CircularNotchedRectangle(),
         notchMargin: 10,
         elevation: 12,
@@ -119,16 +120,21 @@ class _NumiBottomNavState extends State<NumiBottomNav> {
           Icon(
             selected ? activeIcon : icon,
             size: 28,
-            color: selected ? Colors.blue : Colors.black54,
+            color: selected
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).iconTheme.color?.withOpacity(0.6),
+
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: TextStyle(
-              color: selected ? Colors.blue : Colors.black54,
-              fontSize: 12,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: selected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).iconTheme.color?.withOpacity(0.6),
               fontWeight: selected ? FontWeight.bold : FontWeight.normal,
             ),
+
           ),
         ],
       ),

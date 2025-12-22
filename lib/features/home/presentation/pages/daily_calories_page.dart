@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:numi/core/app_colors.dart';
 import 'package:numi/core/widgets/padding_wg.dart';
 import 'package:numi/features/home/domain/entities/user_body_info.dart';
 import 'package:numi/features/home/presentation/bloc/user_body_info/user_body_info_bloc.dart';
@@ -55,19 +53,17 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundLight,
       appBar: AppBar(
-        backgroundColor: AppColors.backgroundLight,
         elevation: 0,
         title: Text(
           "Daily Calories",
-          style: GoogleFonts.dmSans(
-            fontSize: 20.sp,
-            fontWeight: FontWeight.bold,
-          ),
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, size: 24.w, color: Colors.black),
+          icon: Icon(
+            Icons.arrow_back_ios,
+            color: Theme.of(context).iconTheme.color,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -108,7 +104,10 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
                       child: RadioListTile<Gender>(
                         value: g,
                         groupValue: _gender,
-                        title: Text(g.name),
+                        title: Text(
+                          g.name,
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
                         onChanged: (v) => setState(() => _gender = v!),
                       ),
                     );
@@ -121,15 +120,10 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
               _card(
                 child: DropdownButtonFormField<ActivityLevel>(
                   value: _activityLevel,
-                  dropdownColor: AppColors.backgroundLight,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                  ),
+                  dropdownColor: Theme.of(context).cardColor,
+                  decoration: const InputDecoration(border: InputBorder.none),
                   items: ActivityLevel.values.map((a) {
-                    return DropdownMenuItem(
-                      value: a,
-                      child: Text(a.name),
-                    );
+                    return DropdownMenuItem(value: a, child: Text(a.name));
                   }).toList(),
                   onChanged: (v) => setState(() => _activityLevel = v!),
                 ),
@@ -142,18 +136,15 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
                 child: ElevatedButton(
                   onPressed: _save,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.lightGreen,
+                    backgroundColor: Theme.of(context).primaryColor,
+
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14.r),
                     ),
                   ),
                   child: Text(
                     "Save & Calculate",
-                    style: GoogleFonts.dmSans(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.backgroundDark,
-                    ),
+                    style: Theme.of(context).textTheme.labelLarge,
                   ),
                 ),
               ),
@@ -170,7 +161,7 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: AppColors.searchColor,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16.r),
       ),
       child: child,
@@ -187,7 +178,7 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
           labelText: label,
           border: const OutlineInputBorder(borderSide: BorderSide.none),
           filled: true,
-          fillColor: AppColors.backgroundLight,
+          fillColor: Theme.of(context).cardColor,
         ),
       ),
     );
@@ -196,13 +187,7 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
   Widget _sectionTitle(String text) {
     return Padding(
       padding: EdgeInsets.only(bottom: 10.h),
-      child: Text(
-        text,
-        style: GoogleFonts.dmSans(
-          fontSize: 18.sp,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+      child: Text(text, style: Theme.of(context).textTheme.titleMedium),
     );
   }
 }

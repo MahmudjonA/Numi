@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../../../core/app_colors.dart';
+import 'package:numi/core/constants/extensions/string_extensions.dart';
+import '../../../../core/constants/extensions/mealImage.dart';
 import '../../domain/entities/meal.dart';
 import '../bloc/meal/meal_bloc.dart';
 import '../bloc/meal/meal_event.dart';
@@ -18,24 +18,19 @@ class LastMealWg extends StatelessWidget {
       return Center(
         child: Text(
           "No meals yet",
-          style: TextStyle(
-            fontSize: 16.sp,
-            fontWeight: FontWeight.bold,
-            color: AppColors.searchTextColor,
-          ),
+          style: Theme.of(context).textTheme.bodyMedium,
         ),
       );
     }
 
-    final int totalCalories =
-    meals.fold(0, (sum, meal) => sum + meal.calories);
+    final int totalCalories = meals.fold(0, (sum, meal) => sum + meal.calories);
     final DateTime date = meals.first.dateTime;
 
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16.r),
-        color: AppColors.bg,
+        color: Theme.of(context).colorScheme.surface,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,19 +39,15 @@ class LastMealWg extends StatelessWidget {
             children: [
               Text(
                 "Consumed",
-                style: GoogleFonts.dmSans(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.greenColor,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
               const Spacer(),
               Text(
                 "$totalCalories kcal",
-                style: GoogleFonts.dmSans(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.greenColor,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -66,10 +57,7 @@ class LastMealWg extends StatelessWidget {
 
           Text(
             formatDate(date),
-            style: TextStyle(
-              fontSize: 14.sp,
-              fontWeight: FontWeight.w500,
-            ),
+            style: Theme.of(context).textTheme.labelMedium,
           ),
 
           SizedBox(height: 12.h),
@@ -81,13 +69,11 @@ class LastMealWg extends StatelessWidget {
                 padding: EdgeInsets.all(12.h),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12.r),
-                  color: AppColors.lightGrey,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 child: Row(
                   children: [
-                    meal.imagePath != null
-                        ? Image.asset(meal.imagePath!, width: 40.w)
-                        : Icon(Icons.fastfood, size: 40),
+                    mealImage(meal),
 
                     SizedBox(width: 12.w),
 
@@ -95,24 +81,36 @@ class LastMealWg extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          meal.name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14.sp,
-                          ),
+                          meal.name.capitalize().replaceAll("_", " "),
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
                         ),
-                        Text("${meal.calories} kcal"),
+
+                        Text(
+                          "${meal.calories} kcal",
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: Theme.of(context).colorScheme.surface,
+                              ),
+                        ),
                       ],
                     ),
 
                     const Spacer(),
 
                     IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
+                      icon: Icon(
+                        Icons.delete,
+                        color: Theme.of(context).colorScheme.surface,
+                      ),
+
                       onPressed: () {
-                        context
-                            .read<MealBloc>()
-                            .add(DeleteMealEvent(id: meal.id));
+                        context.read<MealBloc>().add(
+                          DeleteMealEvent(id: meal.id),
+                        );
                       },
                     ),
                   ],

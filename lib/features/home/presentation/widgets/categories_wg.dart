@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/widgets/path_generater.dart';
 import '../pages/category_meals_page.dart';
 
@@ -30,7 +29,11 @@ class _CategoriesWgState extends State<CategoriesWg> {
     if (categories.isEmpty) {
       return SizedBox(
         height: 120.h,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(
+          child: CircularProgressIndicator(
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
       );
     }
 
@@ -69,23 +72,26 @@ class _CategoriesWgState extends State<CategoriesWg> {
         margin: EdgeInsets.symmetric(horizontal: 6.w),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
-          color: AppColors.lightGreen,
+          color: Theme.of(context).colorScheme.primary,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (imagePath == null)
-              Icon(Icons.category, size: 30.h, color: Colors.white)
+              Icon(
+                Icons.category,
+                size: 30.h,
+                color: Theme.of(context).colorScheme.onPrimary,
+              )
             else
               Image.asset(imagePath, width: 30.w, height: 30.h),
 
             SizedBox(height: 8.h),
             Text(
               title.replaceAll('_', ' '),
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 13.sp,
-                fontWeight: FontWeight.bold,
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onPrimary,
+                fontWeight: FontWeight.w600,
               ),
             ),
           ],

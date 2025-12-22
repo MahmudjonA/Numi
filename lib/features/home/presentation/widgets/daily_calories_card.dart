@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:numi/core/app_colors.dart';
 import 'package:numi/features/home/presentation/bloc/user_body_info/user_body_info_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/user_body_info/user_body_info_state.dart';
 
@@ -29,7 +28,8 @@ class DailyCaloriesCard extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(16.r),
               decoration: BoxDecoration(
-                color: AppColors.searchColor,
+                color: Theme.of(context).cardColor,
+
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Row(
@@ -41,32 +41,33 @@ class DailyCaloriesCard extends StatelessWidget {
                       children: [
                         Text(
                           "Daily Calories",
-                          style: GoogleFonts.dmSans(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.searchTextColor,
-                          ),
+                          style: Theme.of(context).textTheme.labelMedium,
                         ),
                         SizedBox(height: 4.h),
                         Row(
                           children: [
                             Text(
                               caloriesText,
-                              style: GoogleFonts.dmSans(
-                                fontSize: 28.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
-                              ),
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(width: 4.w),
                             Text(
                               "kcal",
-                              style: GoogleFonts.dmSans(
-                                fontSize: 14.sp,
-                                color: Colors.red,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary,
+                                  ),
                             ),
                           ],
                         ),
@@ -77,8 +78,7 @@ class DailyCaloriesCard extends StatelessWidget {
                   /// RIGHT (icon)
                   Icon(
                     Icons.local_fire_department,
-                    color: Colors.red,
-                    size: 32.h,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
                 ],
               ),

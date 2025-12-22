@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:numi/core/app_colors.dart';
 import 'package:numi/core/widgets/padding_wg.dart';
 import 'package:numi/features/home/presentation/widgets/last_meal_wg.dart';
 import '../../domain/use_cases/group_meals_by_day_use_case.dart';
@@ -18,13 +16,10 @@ class MealPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         title: Text(
           'Meal History',
-          style: GoogleFonts.dmSans(
-            fontSize: 24.sp,
-            fontWeight: FontWeight.bold,
-            color: AppColors.lightOrange,
-          ),
+          style: Theme.of(context).textTheme.titleLarge,
         ),
       ),
       body: PaddingWg(
@@ -44,13 +39,20 @@ class MealPage extends StatelessWidget {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Today's Meals"),
+                  Text(
+                    "Today's Meals",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+
                   SizedBox(height: 12.h),
                   LastMealWg(meals: grouped[todayKey] ?? []),
 
                   SizedBox(height: 24.h),
 
-                  Text("Yesterday's Meals"),
+                  Text(
+                    "Yesterday's Meals",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
                   SizedBox(height: 12.h),
                   LastMealWg(meals: grouped[yesterdayKey] ?? []),
                 ],

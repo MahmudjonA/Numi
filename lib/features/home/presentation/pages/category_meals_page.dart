@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:numi/features/home/domain/entities/meal.dart';
 import 'package:numi/features/home/presentation/bloc/meal/meal_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/meal/meal_event.dart';
-import '../../../../core/app_colors.dart';
 import '../../../../core/constants/food_calories.dart';
 
 class CategoryMealsPage extends StatelessWidget {
@@ -21,9 +20,12 @@ class CategoryMealsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(categoryName.replaceAll('_', ' ')),
-        backgroundColor: AppColors.backgroundLight,
+        title: Text(
+          categoryName.replaceAll('_', ' '),
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
       ),
+
       body: GridView.builder(
         padding: EdgeInsets.all(16.w),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -49,14 +51,19 @@ class CategoryMealsPage extends StatelessWidget {
 
               context.read<MealBloc>().add(AddMealEvent(meal: meal));
 
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('$mealName added')));
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   SnackBar(
+              //     content: Text(
+              //       '$mealName added',
+              //       style: Theme.of(context).textTheme.bodyMedium,
+              //     ),
+              //   ),
+              // );
             },
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16.r),
-                color: AppColors.lightGrey,
+                color: Theme.of(context).colorScheme.primary,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +72,9 @@ class CategoryMealsPage extends StatelessWidget {
                   SizedBox(height: 8.h),
                   Text(
                     mealName.replaceAll('_', ' '),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),

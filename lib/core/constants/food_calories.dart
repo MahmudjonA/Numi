@@ -5,9 +5,12 @@ const Map<String, int> foodCalories = {
   'orange': 47,
 
   // Bread
-  'bread': 265,
-  'baguette': 270,
-  'toast': 313,
+  'bread_slice': 80,
+  'toast_slice': 75,
+  'baguette_slice': 90,
+  'flatbread_slice': 70,
+  'lavash_bread' : 120,
+
 
   // Eggs
   'egg': 155,
