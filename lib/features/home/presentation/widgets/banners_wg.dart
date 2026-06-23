@@ -6,17 +6,61 @@ class BannersWg extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Container(
-      margin:  EdgeInsets.only(left: 12.w),
-      width: 340.w,
-      height: 200.h,
+    return Container(
+      width: double.infinity,
+      height: 160.h,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.r),
-        image:  DecorationImage(
+        borderRadius: BorderRadius.circular(20.r),
+        image: const DecorationImage(
           image: AssetImage("assets/image.jpg"),
           fit: BoxFit.cover,
         ),
-        color: Colors.blue,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.r),
+          gradient: LinearGradient(
+            colors: [
+              Colors.black.withValues(alpha: 0.55),
+              Colors.transparent,
+            ],
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+          ),
+        ),
+        padding: EdgeInsets.all(20.r),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Sog'lom turmush\ntarzi boshlanadi",
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                height: 1.3,
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Container(
+              padding:
+                  EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
+              decoration: BoxDecoration(
+                color: const Color(0xFF24AC8B),
+                borderRadius: BorderRadius.circular(20.r),
+              ),
+              child: Text(
+                "Bugun kuzat →",
+                style: TextStyle(
+                  fontSize: 11.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

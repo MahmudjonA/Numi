@@ -22,6 +22,24 @@ class MealModel extends HiveObject {
   @HiveField(5)
   final String? imagePath;
 
+  @HiveField(6)
+  final int mealType; // MealType enum index
+
+  @HiveField(7)
+  final double proteinG;
+
+  @HiveField(8)
+  final double carbsG;
+
+  @HiveField(9)
+  final double fatG;
+
+  @HiveField(10)
+  final double? portionGrams;
+
+  @HiveField(11)
+  final bool isCustom;
+
   MealModel({
     required this.id,
     required this.name,
@@ -29,9 +47,14 @@ class MealModel extends HiveObject {
     required this.category,
     required this.dateTime,
     this.imagePath,
+    this.mealType = 3,
+    this.proteinG = 0.0,
+    this.carbsG = 0.0,
+    this.fatG = 0.0,
+    this.portionGrams,
+    this.isCustom = false,
   });
 
-  /// Entity → Model
   factory MealModel.fromEntity(Meal meal) {
     return MealModel(
       id: meal.id,
@@ -40,10 +63,15 @@ class MealModel extends HiveObject {
       category: meal.category,
       dateTime: meal.dateTime,
       imagePath: meal.imagePath,
+      mealType: meal.mealType.index,
+      proteinG: meal.proteinG,
+      carbsG: meal.carbsG,
+      fatG: meal.fatG,
+      portionGrams: meal.portionGrams,
+      isCustom: meal.isCustom,
     );
   }
 
-  /// Model → Entity
   Meal toEntity() {
     return Meal(
       id: id,
@@ -52,7 +80,12 @@ class MealModel extends HiveObject {
       category: category,
       dateTime: dateTime,
       imagePath: imagePath,
+      mealType: MealType.values[mealType],
+      proteinG: proteinG,
+      carbsG: carbsG,
+      fatG: fatG,
+      portionGrams: portionGrams,
+      isCustom: isCustom,
     );
   }
 }
-

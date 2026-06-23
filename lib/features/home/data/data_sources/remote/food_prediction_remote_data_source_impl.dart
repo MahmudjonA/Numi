@@ -10,7 +10,11 @@ class FoodPredictionRemoteDataSourceImpl
     extends FoodPredictionRemoteDataSource {
   final DioClient dioClient = DioClient();
 
-  static const String _apiKey = "61d8d7c04433493d952f78e67377ec96";
+  // API key --dart-define=CLARIFAI_API_KEY=... orqali uzatiladi
+  static const String _apiKey = String.fromEnvironment(
+    'CLARIFAI_API_KEY',
+    defaultValue: '61d8d7c04433493d952f78e67377ec96',
+  );
   static const String _modelId = "food-item-recognition";
   static const String _modelVersion = "1d5fd481e0cf4826aa72ec3ff049e044";
 
@@ -25,7 +29,8 @@ class FoodPredictionRemoteDataSourceImpl
       final bytes = await image.readAsBytes();
       final base64Image = base64Encode(bytes);
 
-      final String path = "models/$_modelId/versions/$_modelVersion/outputs";
+      final String path =
+          "models/$_modelId/versions/$_modelVersion/outputs";
 
       LoggerService.debug("Sending request to Clarifai...");
 
@@ -43,7 +48,6 @@ class FoodPredictionRemoteDataSourceImpl
       );
 
       LoggerService.info("Clarifai response received");
-
       return FoodPredictionModel.fromJson(response.data);
     } catch (e) {
       LoggerService.error("Clarifai error: $e");

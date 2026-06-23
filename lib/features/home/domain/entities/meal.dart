@@ -1,3 +1,5 @@
+enum MealType { Breakfast, Lunch, Dinner, Snack }
+
 class Meal {
   final String id;
   final String name;
@@ -5,6 +7,12 @@ class Meal {
   final String category;
   final DateTime dateTime;
   final String? imagePath;
+  final MealType mealType;
+  final double proteinG;
+  final double carbsG;
+  final double fatG;
+  final double? portionGrams;
+  final bool isCustom;
 
   const Meal({
     required this.id,
@@ -13,6 +21,12 @@ class Meal {
     required this.category,
     required this.dateTime,
     this.imagePath,
+    this.mealType = MealType.Snack,
+    this.proteinG = 0.0,
+    this.carbsG = 0.0,
+    this.fatG = 0.0,
+    this.portionGrams,
+    this.isCustom = false,
   });
 }
 
