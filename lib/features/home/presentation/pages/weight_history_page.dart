@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:numi/core/l10n/app_strings.dart';
 import 'package:numi/features/home/presentation/bloc/weight/weight_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/weight/weight_event.dart';
 import 'package:numi/features/home/presentation/bloc/weight/weight_state.dart';
@@ -12,12 +13,11 @@ class WeightHistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Vazn tarixi",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        title: Text(s.weightHistoryTitle,
+            style: Theme.of(context).textTheme.titleLarge),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
@@ -36,26 +36,21 @@ class WeightHistoryPage extends StatelessWidget {
             return ListView(
               padding: EdgeInsets.all(16.r),
               children: [
-                // ── Grafik ───────────────────────────────
                 if (state.entries.isNotEmpty) ...[
                   _WeightChart(entries: state.entries),
                   SizedBox(height: 16.h),
                   _SummaryRow(state: state),
                   SizedBox(height: 16.h),
                 ],
-
-                // ── Ro'yxat ──────────────────────────────
-                Text(
-                  "Yozuvlar",
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+                Text(s.weightRecords,
+                    style: Theme.of(context).textTheme.titleMedium),
                 SizedBox(height: 10.h),
                 if (state.entries.isEmpty)
                   Center(
                     child: Padding(
                       padding: EdgeInsets.only(top: 40.h),
                       child: Text(
-                        "Hali vazn kiritilmagan\n+ tugmasini bosing",
+                        s.noWeightYet,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
@@ -176,6 +171,7 @@ class _SummaryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s      = S.of(context);
     final change = state.change;
     final changeText = change == null
         ? '—'
@@ -191,24 +187,22 @@ class _SummaryRow extends StatelessWidget {
     return Row(
       children: [
         _Card(
-          label: "Hozirgi",
-          value:
-              "${state.latest?.weightKg.toStringAsFixed(1) ?? '—'} kg",
+          label: s.currentWeightLabel,
+          value: "${state.latest?.weightKg.toStringAsFixed(1) ?? '—'} kg",
           color: Theme.of(context).colorScheme.primary,
           context: context,
         ),
         SizedBox(width: 8.w),
         _Card(
-          label: "O'zgarish (7 kun)",
+          label: s.weekChangeLabel,
           value: changeText,
           color: changeColor,
           context: context,
         ),
         SizedBox(width: 8.w),
         _Card(
-          label: "O'rtacha",
-          value:
-              "${state.average?.toStringAsFixed(1) ?? '—'} kg",
+          label: s.averageWeightLabel,
+          value: "${state.average?.toStringAsFixed(1) ?? '—'} kg",
           color: Theme.of(context).colorScheme.primary,
           context: context,
         ),
@@ -242,15 +236,14 @@ class _Card extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label,
-                style: Theme.of(context).textTheme.labelSmall),
+            Text(label, style: Theme.of(context).textTheme.labelSmall),
             SizedBox(height: 4.h),
             Text(
               value,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: color, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
           ],
         ),
@@ -318,8 +311,8 @@ class _AddWeightDialog extends StatefulWidget {
 
 class _AddWeightDialogState extends State<_AddWeightDialog> {
   final _weightCtrl = TextEditingController();
-  final _noteCtrl = TextEditingController();
-  DateTime _date = DateTime.now();
+  final _noteCtrl   = TextEditingController();
+  DateTime _date    = DateTime.now();
 
   @override
   void dispose() {
@@ -329,10 +322,11 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
   }
 
   void _save() {
+    final s = S.of(context);
     final w = double.tryParse(_weightCtrl.text);
     if (w == null || w < 20 || w > 300) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Vazn 20–300 kg oralig'ida bo'lishi kerak")),
+        SnackBar(content: Text(s.weightRangeError)),
       );
       return;
     }
@@ -348,18 +342,20 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return AlertDialog(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      title: Text("Vazn kiriting",
+      title: Text(s.addWeightDialogTitle,
           style: Theme.of(context).textTheme.titleMedium),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _weightCtrl,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            keyboardType:
+                const TextInputType.numberWithOptions(decimal: true),
             decoration: InputDecoration(
-              labelText: "Vazn (kg)",
+              labelText: s.weightHint,
               filled: true,
               fillColor: Theme.of(context).cardColor,
               border: OutlineInputBorder(
@@ -372,8 +368,8 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
           TextField(
             controller: _noteCtrl,
             decoration: InputDecoration(
-              labelText: "Izoh (ixtiyoriy)",
-              hintText: "Masalan: Ertalab",
+              labelText: s.noteOptional,
+              hintText: s.noteHint,
               filled: true,
               fillColor: Theme.of(context).cardColor,
               border: OutlineInputBorder(
@@ -395,7 +391,8 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
               final picked = await showDatePicker(
                 context: context,
                 initialDate: _date,
-                firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                firstDate:
+                    DateTime.now().subtract(const Duration(days: 365)),
                 lastDate: DateTime.now(),
               );
               if (picked != null) setState(() => _date = picked);
@@ -406,14 +403,14 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("Bekor"),
+          child: Text(s.cancelBtn),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary),
           onPressed: _save,
-          child: const Text("Saqlash",
-              style: TextStyle(color: Colors.white)),
+          child: Text(s.saveBtn,
+              style: const TextStyle(color: Colors.white)),
         ),
       ],
     );

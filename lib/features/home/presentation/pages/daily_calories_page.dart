@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:numi/core/l10n/app_strings.dart';
 import 'package:numi/core/widgets/padding_wg.dart';
 import 'package:numi/features/home/domain/entities/user_body_info.dart';
 import 'package:numi/features/home/presentation/bloc/user_body_info/user_body_info_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/user_body_info/user_body_info_event.dart';
 import 'package:numi/features/home/presentation/bloc/user_body_info/user_body_info_state.dart';
+import 'package:numi/features/home/presentation/bloc/water/water_bloc.dart';
+import 'package:numi/features/home/presentation/bloc/water/water_event.dart';
 
 class DailyCaloriesPage extends StatefulWidget {
   const DailyCaloriesPage({super.key});
@@ -17,9 +20,9 @@ class DailyCaloriesPage extends StatefulWidget {
 class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
   final _weightCtrl = TextEditingController();
   final _heightCtrl = TextEditingController();
-  final _ageCtrl = TextEditingController();
+  final _ageCtrl    = TextEditingController();
 
-  Gender _gender = Gender.Male;
+  Gender        _gender        = Gender.Male;
   ActivityLevel _activityLevel = ActivityLevel.Moderate;
 
   @override
@@ -31,7 +34,7 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
   void _save() {
     final weight = double.tryParse(_weightCtrl.text);
     final height = double.tryParse(_heightCtrl.text);
-    final age = int.tryParse(_ageCtrl.text);
+    final age    = int.tryParse(_ageCtrl.text);
 
     if (weight == null || height == null || age == null) return;
 
@@ -46,24 +49,22 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
     context.read<UserBodyInfoBloc>().add(
       SaveUserBodyInfoEvent(userBodyInfo: bodyInfo),
     );
+    context.read<WaterBloc>().add(LoadWaterEvent());
 
     Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        title: Text(
-          "Daily Calories",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        title: Text(s.dailyCalTitle,
+            style: Theme.of(context).textTheme.titleLarge),
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back_ios,
-            color: Theme.of(context).iconTheme.color,
-          ),
+          icon: Icon(Icons.arrow_back_ios,
+              color: Theme.of(context).iconTheme.color),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -72,10 +73,10 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
           if (state is UserBodyInfoLoaded) {
             _weightCtrl.text = state.userBodyInfo.weightKg.toString();
             _heightCtrl.text = state.userBodyInfo.heightCm.toString();
-            _ageCtrl.text = state.userBodyInfo.age.toString();
+            _ageCtrl.text    = state.userBodyInfo.age.toString();
 
             setState(() {
-              _gender = state.userBodyInfo.gender;
+              _gender        = state.userBodyInfo.gender;
               _activityLevel = state.userBodyInfo.activityLevel;
             });
           }
@@ -84,19 +85,19 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _sectionTitle("Your body"),
+              _sectionTitle(s.yourBody),
               _card(
                 child: Column(
                   children: [
-                    _inputField(_weightCtrl, "Weight (kg)"),
-                    _inputField(_heightCtrl, "Height (cm)"),
-                    _inputField(_ageCtrl, "Age"),
+                    _inputField(_weightCtrl, s.weightKgHint),
+                    _inputField(_heightCtrl, s.heightCmHint),
+                    _inputField(_ageCtrl, s.ageHint),
                   ],
                 ),
               ),
               SizedBox(height: 20.h),
 
-              _sectionTitle("Gender"),
+              _sectionTitle(s.genderLabel),
               _card(
                 child: Row(
                   children: Gender.values.map((g) {
@@ -104,10 +105,8 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
                       child: RadioListTile<Gender>(
                         value: g,
                         groupValue: _gender,
-                        title: Text(
-                          g.name,
-                          style: Theme.of(context).textTheme.labelLarge,
-                        ),
+                        title: Text(g.name,
+                            style: Theme.of(context).textTheme.labelLarge),
                         onChanged: (v) => setState(() => _gender = v!),
                       ),
                     );
@@ -116,7 +115,7 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
               ),
               SizedBox(height: 20.h),
 
-              _sectionTitle("Activity level"),
+              _sectionTitle(s.activityLevelLabel),
               _card(
                 child: DropdownButtonFormField<ActivityLevel>(
                   value: _activityLevel,
@@ -137,13 +136,12 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
                   onPressed: _save,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).primaryColor,
-
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14.r),
                     ),
                   ),
                   child: Text(
-                    "Save & Calculate",
+                    s.saveAndCalc,
                     style: Theme.of(context).textTheme.labelLarge,
                   ),
                 ),
@@ -154,8 +152,6 @@ class _DailyCaloriesPageState extends State<DailyCaloriesPage> {
       ),
     );
   }
-
-  /// ---------- UI helpers ----------
 
   Widget _card({required Widget child}) {
     return Container(

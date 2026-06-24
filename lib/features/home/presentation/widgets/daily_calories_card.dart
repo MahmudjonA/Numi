@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:numi/core/l10n/app_strings.dart';
 import '../bloc/meal/meal_bloc.dart';
 import '../bloc/meal/meal_state.dart';
 import '../bloc/user_body_info/user_body_info_bloc.dart';
@@ -14,6 +15,7 @@ class DailyCaloriesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return BlocBuilder<UserBodyInfoBloc, UserBodyInfoState>(
       builder: (context, bodyState) {
         return BlocBuilder<MealBloc, MealState>(
@@ -31,8 +33,8 @@ class DailyCaloriesCard extends StatelessWidget {
               final todayMeals = grouped[key] ?? [];
               consumedKcal = todayMeals.fold(0, (s, m) => s + m.calories);
               protein = todayMeals.fold(0.0, (s, m) => s + m.proteinG);
-              carbs = todayMeals.fold(0.0, (s, m) => s + m.carbsG);
-              fat = todayMeals.fold(0.0, (s, m) => s + m.fatG);
+              carbs   = todayMeals.fold(0.0, (s, m) => s + m.carbsG);
+              fat     = todayMeals.fold(0.0, (s, m) => s + m.fatG);
             }
 
             final progress = goalKcal > 0
@@ -76,7 +78,7 @@ class DailyCaloriesCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Kunlik kaloriya",
+                                  s.dailyCaloriesCard,
                                   style: Theme.of(context)
                                       .textTheme
                                       .labelMedium
@@ -125,8 +127,8 @@ class DailyCaloriesCard extends StatelessWidget {
                               SizedBox(height: 4.h),
                               Text(
                                 goalKcal > 0
-                                    ? "$remaining kcal qoldi"
-                                    : "Maqsad yo'q",
+                                    ? s.kcalLeft(remaining)
+                                    : s.noGoalLabel,
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelSmall
@@ -193,7 +195,7 @@ class _MacroBar extends StatelessWidget {
   final String label;
   final double value;
   final double goal;
-  final Color color;
+  final Color  color;
 
   const _MacroBar({
     required this.label,

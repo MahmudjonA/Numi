@@ -7,12 +7,16 @@ Widget mealImage(Meal meal) {
       meal.imagePath!,
       width: 40,
       height: 40,
+      errorBuilder: (_, __, ___) => const Icon(
+        Icons.restaurant_rounded,
+        size: 24,
+        color: Color(0xFF24AC8B),
+      ),
     );
   }
-
   return const Icon(
-    Icons.camera_alt,
-    color: Colors.black,
-    size: 40,
+    Icons.restaurant_rounded,
+    size: 24,
+    color: Color(0xFF24AC8B),
   );
 }

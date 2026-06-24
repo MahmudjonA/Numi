@@ -142,6 +142,6 @@ Future<void> setup() async {
     () => WeightBloc(sl(), sl(), sl())..add(LoadWeightHistoryEvent()),
   );
   sl.registerLazySingleton(
-    () => WaterBloc(sl())..add(LoadWaterEvent()),
+    () => WaterBloc(sl(), sl())..add(LoadWaterEvent()),
   );
 }

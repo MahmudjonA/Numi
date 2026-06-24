@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:numi/core/l10n/app_strings.dart';
 import 'package:numi/features/home/domain/entities/meal.dart';
 import 'package:numi/features/home/presentation/bloc/custom_food/custom_food_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/custom_food/custom_food_event.dart';
@@ -27,19 +28,18 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
 
   void _addToMeals(BuildContext context, customFood) {
     MealType selected = MealType.Snack;
+    final s = S.of(context);
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: Theme.of(context).cardColor,
-        title: Text(
-          "Ovqat turi",
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        title: Text(s.mealTypeDialogTitle,
+            style: Theme.of(context).textTheme.titleMedium),
         content: StatefulBuilder(
           builder: (ctx, setSt) => Column(
             mainAxisSize: MainAxisSize.min,
             children: MealType.values.map((t) {
-              final label = _typeLabel(t);
+              final label = _typeLabel(s, t);
               return RadioListTile<MealType>(
                 value: t,
                 groupValue: selected,
@@ -54,7 +54,7 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Bekor"),
+            child: Text(s.cancelBtn),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -77,12 +77,11 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                    content:
-                        Text("${customFood.name} qo'shildi")),
+                    content: Text(s.foodAddedSnack(customFood.name, customFood.calories))),
               );
             },
-            child: const Text("Qo'shish",
-                style: TextStyle(color: Colors.white)),
+            child: Text(s.addBtnLabel,
+                style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -91,17 +90,17 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Mening ovqatlarim",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        title: Text(s.myFoodsPageTitle,
+            style: Theme.of(context).textTheme.titleLarge),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const AddMealManualPage()),
+          MaterialPageRoute(
+              builder: (_) => const AddMealManualPage()),
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add, color: Colors.white),
@@ -114,7 +113,7 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
             child: TextField(
               onChanged: (v) => setState(() => _query = v.toLowerCase()),
               decoration: InputDecoration(
-                hintText: "Ovqat qidirish...",
+                hintText: s.searchFoodHint,
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
                 fillColor: Theme.of(context).cardColor,
@@ -140,8 +139,7 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
 
                 if (state is CustomFoodLoaded) {
                   final filtered = state.foods
-                      .where((f) =>
-                          f.name.toLowerCase().contains(_query))
+                      .where((f) => f.name.toLowerCase().contains(_query))
                       .toList();
 
                   if (filtered.isEmpty) {
@@ -156,18 +154,17 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
                                   .primary
                                   .withValues(alpha: 0.4)),
                           SizedBox(height: 12.h),
-                          Text(
-                            "Ovqat topilmadi",
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
+                          Text(s.foodNotFound,
+                              style: Theme.of(context).textTheme.bodyMedium),
                           SizedBox(height: 8.h),
                           TextButton(
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (_) => const AddMealManualPage()),
+                                  builder: (_) =>
+                                      const AddMealManualPage()),
                             ),
-                            child: const Text("+ Yangi qo'shish"),
+                            child: Text(s.addNewFood),
                           ),
                         ],
                       ),
@@ -190,7 +187,9 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
                               horizontal: 14.w, vertical: 4.h),
                           title: Text(
                             food.name,
-                            style: Theme.of(context).textTheme.bodyMedium
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
                                 ?.copyWith(fontWeight: FontWeight.w600),
                           ),
                           subtitle: Text(
@@ -203,8 +202,9 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
                               IconButton(
                                 icon: Icon(
                                   Icons.add_circle,
-                                  color:
-                                      Theme.of(context).colorScheme.primary,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primary,
                                 ),
                                 onPressed: () =>
                                     _addToMeals(context, food),
@@ -234,12 +234,12 @@ class _MyFoodsPageState extends State<MyFoodsPage> {
     );
   }
 
-  String _typeLabel(MealType t) {
+  String _typeLabel(S s, MealType t) {
     switch (t) {
-      case MealType.Breakfast: return "Nonushta";
-      case MealType.Lunch:     return "Tushlik";
-      case MealType.Dinner:    return "Kechki ovqat";
-      case MealType.Snack:     return "Snack";
+      case MealType.Breakfast: return s.breakfast;
+      case MealType.Lunch:     return s.lunch;
+      case MealType.Dinner:    return s.dinner;
+      case MealType.Snack:     return s.snack;
     }
   }
 }

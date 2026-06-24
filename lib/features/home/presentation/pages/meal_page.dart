@@ -3,12 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:numi/core/l10n/app_strings.dart';
 import 'package:numi/features/home/domain/entities/meal.dart';
-import 'package:numi/features/home/presentation/pages/my_foods_page.dart';
 import 'package:numi/features/home/presentation/widgets/last_meal_wg.dart';
 import '../../domain/use_cases/group_meals_by_day_use_case.dart';
 import '../bloc/meal/meal_bloc.dart';
 import '../bloc/meal/meal_state.dart';
-import 'add_meal_manual_page.dart';
 
 class MealPage extends StatefulWidget {
   const MealPage({super.key});
@@ -22,31 +20,14 @@ class _MealPageState extends State<MealPage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
-        title: Text(S.of(context).mealHistoryTitle,
+        title: Text(s.mealHistoryTitle,
             style: Theme.of(context).textTheme.titleLarge),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.book_outlined),
-            tooltip: S.of(context).myFoodsTitle,
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const MyFoodsPage()),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add_rounded),
-            tooltip: S.of(context).addManualBtn,
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AddMealManualPage()),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: BlocBuilder<MealBloc, MealState>(
@@ -82,9 +63,9 @@ class _MealPageState extends State<MealPage> {
                       padding: EdgeInsets.symmetric(
                           horizontal: 16.w, vertical: 6.h),
                       children: [
-                        _buildFilterChip(S.of(context).all, null),
+                        _buildFilterChip(s.all, null),
                         ...MealType.values
-                            .map((t) => _buildFilterChip(_typeLabel(S.of(context), t), t)),
+                            .map((t) => _buildFilterChip(_typeLabel(s, t), t)),
                       ],
                     ),
                   ),
@@ -180,12 +161,12 @@ class _DayBlockState extends State<_DayBlock> {
 
   @override
   Widget build(BuildContext context) {
-    final total = widget.meals.fold(0, (s, m) => s + m.calories);
+    final total   = widget.meals.fold(0, (s, m) => s + m.calories);
     final protein = widget.meals.fold(0.0, (s, m) => s + m.proteinG);
-    final carbs = widget.meals.fold(0.0, (s, m) => s + m.carbsG);
-    final fat = widget.meals.fold(0.0, (s, m) => s + m.fatG);
+    final carbs   = widget.meals.fold(0.0, (s, m) => s + m.carbsG);
+    final fat     = widget.meals.fold(0.0, (s, m) => s + m.fatG);
 
-    final today = DateTime.now();
+    final today    = DateTime.now();
     final todayKey = DateTime(today.year, today.month, today.day);
     final d = widget.date;
     final s = S.of(context);
@@ -210,7 +191,6 @@ class _DayBlockState extends State<_DayBlock> {
       ),
       child: Column(
         children: [
-          // Header
           InkWell(
             borderRadius: BorderRadius.circular(18.r),
             onTap: () => setState(() => _expanded = !_expanded),
@@ -263,14 +243,12 @@ class _DayBlockState extends State<_DayBlock> {
                         ),
                         SizedBox(height: 2.h),
                         Text(
-                          "$total kcal  •  ${widget.meals.length} ta ovqat",
+                          "$total kcal  •  ${widget.meals.length} ${s.mealsCount(widget.meals.length)}",
                           style: Theme.of(context)
                               .textTheme
                               .labelSmall
                               ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary,
+                                color: Theme.of(context).colorScheme.primary,
                               ),
                         ),
                         Text(
@@ -298,8 +276,6 @@ class _DayBlockState extends State<_DayBlock> {
               ),
             ),
           ),
-
-          // Ovqatlar ro'yxati
           if (_expanded)
             Padding(
               padding:
@@ -324,6 +300,7 @@ class _DayBlockState extends State<_DayBlock> {
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -338,7 +315,7 @@ class _EmptyState extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           Text(
-            "Hali ovqat qo'shilmagan",
+            s.noMealsYet,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context)
                       .colorScheme
@@ -348,7 +325,7 @@ class _EmptyState extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           Text(
-            "Kamera yoki + tugmasini bosing",
+            s.noMealsHint,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
                   color: Theme.of(context)
                       .colorScheme

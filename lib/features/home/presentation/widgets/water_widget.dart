@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:numi/core/l10n/app_strings.dart';
 import 'package:numi/features/home/presentation/bloc/water/water_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/water/water_event.dart';
 import 'package:numi/features/home/presentation/bloc/water/water_state.dart';
@@ -10,15 +11,16 @@ class WaterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return BlocBuilder<WaterBloc, WaterState>(
       builder: (context, state) {
-        int total = 0;
-        int goal = 2000;
+        int total      = 0;
+        int goal       = 2000;
         double progress = 0.0;
 
         if (state is WaterLoaded) {
-          total = state.totalMl;
-          goal = state.goalMl;
+          total    = state.totalMl;
+          goal     = state.goalMl;
           progress = state.progress;
         }
 
@@ -36,10 +38,8 @@ class WaterWidget extends StatelessWidget {
                   Icon(Icons.water_drop,
                       color: Colors.blue.shade400, size: 20),
                   SizedBox(width: 6.w),
-                  Text(
-                    "Suv",
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
+                  Text(s.waterLabel,
+                      style: Theme.of(context).textTheme.labelMedium),
                   const Spacer(),
                   Text(
                     "${total}ml / ${goal}ml",

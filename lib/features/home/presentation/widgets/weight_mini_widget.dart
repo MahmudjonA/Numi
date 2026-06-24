@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:numi/core/l10n/app_strings.dart';
 import 'package:numi/features/home/presentation/bloc/weight/weight_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/weight/weight_event.dart';
 import 'package:numi/features/home/presentation/bloc/weight/weight_state.dart';
@@ -11,11 +12,12 @@ class WeightMiniWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return BlocBuilder<WeightBloc, WeightState>(
       builder: (context, state) {
-        String weightText = '—';
-        String changeText = '';
-        Color changeColor = Theme.of(context).colorScheme.primary;
+        String weightText   = '—';
+        String changeText   = '';
+        Color  changeColor  = Theme.of(context).colorScheme.primary;
 
         if (state is WeightLoaded) {
           if (state.latest != null) {
@@ -54,10 +56,8 @@ class WeightMiniWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Vazn",
-                          style: Theme.of(context).textTheme.labelMedium,
-                        ),
+                        Text(s.weightMiniLabel,
+                            style: Theme.of(context).textTheme.labelMedium),
                         SizedBox(height: 2.h),
                         Text(
                           weightText,
@@ -95,11 +95,11 @@ class WeightMiniWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8.r),
                           ),
                           child: Text(
-                            "+ Kiriting",
-                            style:
-                                Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: Colors.white,
-                                    ),
+                            s.addWeightBtn,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
+                                ?.copyWith(color: Colors.white),
                           ),
                         ),
                       ),
@@ -142,10 +142,11 @@ class _QuickWeightDialogState extends State<_QuickWeightDialog> {
   }
 
   void _save() {
+    final s = S.of(context);
     final w = double.tryParse(_ctrl.text);
     if (w == null || w < 20 || w > 300) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Vazn 20–300 kg oralig'ida bo'lishi kerak")),
+        SnackBar(content: Text(s.weightRangeError)),
       );
       return;
     }
@@ -157,9 +158,10 @@ class _QuickWeightDialogState extends State<_QuickWeightDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return AlertDialog(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      title: Text("Bugungi vazn",
+      title: Text(s.todayWeightTitle,
           style: Theme.of(context).textTheme.titleMedium),
       content: TextField(
         controller: _ctrl,
@@ -167,7 +169,7 @@ class _QuickWeightDialogState extends State<_QuickWeightDialog> {
         keyboardType:
             const TextInputType.numberWithOptions(decimal: true),
         decoration: InputDecoration(
-          labelText: "Vazn (kg)",
+          labelText: s.weightHint,
           filled: true,
           fillColor: Theme.of(context).cardColor,
           border: OutlineInputBorder(
@@ -179,13 +181,13 @@ class _QuickWeightDialogState extends State<_QuickWeightDialog> {
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Bekor")),
+            child: Text(s.cancelBtn)),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.primary),
           onPressed: _save,
-          child: const Text("Saqlash",
-              style: TextStyle(color: Colors.white)),
+          child: Text(s.saveBtn,
+              style: const TextStyle(color: Colors.white)),
         ),
       ],
     );

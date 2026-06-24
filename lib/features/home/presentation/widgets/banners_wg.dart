@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:numi/core/l10n/app_strings.dart';
 
 class BannersWg extends StatelessWidget {
   const BannersWg({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final s = S.of(context);
     return Container(
       width: double.infinity,
       height: 160.h,
@@ -34,7 +36,7 @@ class BannersWg extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Sog'lom turmush\ntarzi boshlanadi",
+              s.bannerTitle,
               style: TextStyle(
                 fontSize: 18.sp,
                 fontWeight: FontWeight.bold,
@@ -51,7 +53,7 @@ class BannersWg extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Text(
-                "Bugun kuzat →",
+                s.bannerCta,
                 style: TextStyle(
                   fontSize: 11.sp,
                   fontWeight: FontWeight.w700,

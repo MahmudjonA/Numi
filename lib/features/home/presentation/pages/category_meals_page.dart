@@ -4,9 +4,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:numi/core/constants/food_calories.dart';
 import 'package:numi/core/l10n/app_strings.dart';
+import 'package:numi/features/home/domain/entities/custom_food.dart';
 import 'package:numi/features/home/domain/entities/meal.dart';
+import 'package:numi/features/home/presentation/bloc/custom_food/custom_food_bloc.dart';
+import 'package:numi/features/home/presentation/bloc/custom_food/custom_food_event.dart';
+import 'package:numi/features/home/presentation/bloc/custom_food/custom_food_state.dart';
 import 'package:numi/features/home/presentation/bloc/meal/meal_bloc.dart';
 import 'package:numi/features/home/presentation/bloc/meal/meal_event.dart';
+import 'package:numi/features/home/presentation/bloc/meal/meal_state.dart';
 
 class CategoryMealsPage extends StatefulWidget {
   final String categoryName;
@@ -25,14 +30,18 @@ class CategoryMealsPage extends StatefulWidget {
 class _CategoryMealsPageState extends State<CategoryMealsPage> {
   final Set<String> _addedIds = {};
 
-  // Ovqat bosiganda meal type tanlash bottom sheet ko'rsatadi
+  @override
+  void initState() {
+    super.initState();
+    context.read<CustomFoodBloc>().add(LoadCustomFoodsEvent());
+  }
+
   Future<void> _onFoodTap(BuildContext context, String imagePath) async {
-    final rawName = imagePath.split('/').last.split('.').first;
-    final info = getFoodInfo(rawName);
-    final calories = info?.calories ?? 200;
+    final rawName    = imagePath.split('/').last.split('.').first;
+    final info       = getFoodInfo(rawName);
+    final calories   = info?.calories ?? 200;
     final displayName = rawName.replaceAll('_', ' ');
 
-    // Meal type tanlash bottom sheet
     final MealType? chosen = await showModalBottomSheet<MealType>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -82,8 +91,130 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
         ),
         backgroundColor: const Color(0xFF24AC8B),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.r)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _onCustomFoodTap(BuildContext context, CustomFood food) async {
+    final String? firstImg =
+        widget.images.isNotEmpty ? widget.images.first : null;
+
+    final MealType? chosen = await showModalBottomSheet<MealType>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _MealTypePicker(
+        foodName: food.name,
+        calories: food.calories,
+        imagePath: firstImg,
+      ),
+    );
+
+    if (chosen == null || !mounted) return;
+
+    final meal = Meal(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: food.name,
+      calories: food.calories,
+      category: widget.categoryName,
+      dateTime: DateTime.now(),
+      imagePath: firstImg,
+      mealType: chosen,
+      proteinG: food.proteinG,
+      carbsG: food.carbsG,
+      fatG: food.fatG,
+      isCustom: true,
+    );
+
+    context.read<MealBloc>().add(AddMealEvent(meal: meal));
+
+    setState(() => _addedIds.add(food.id));
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _addedIds.remove(food.id));
+    });
+
+    final typeLabel = _mealTypeLabel(S.of(context), chosen);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Text(
+                "${food.name} ($typeLabel) — ${food.calories} kcal",
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF24AC8B),
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _onMealLogTap(BuildContext context, Meal sourceMeal) async {
+    final String? firstImg =
+        widget.images.isNotEmpty ? widget.images.first : null;
+
+    final MealType? chosen = await showModalBottomSheet<MealType>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _MealTypePicker(
+        foodName: sourceMeal.name,
+        calories: sourceMeal.calories,
+        imagePath: firstImg,
+      ),
+    );
+
+    if (chosen == null || !mounted) return;
+
+    final meal = Meal(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      name: sourceMeal.name,
+      calories: sourceMeal.calories,
+      category: widget.categoryName,
+      dateTime: DateTime.now(),
+      imagePath: firstImg,
+      mealType: chosen,
+      proteinG: sourceMeal.proteinG,
+      carbsG: sourceMeal.carbsG,
+      fatG: sourceMeal.fatG,
+      isCustom: true,
+    );
+
+    context.read<MealBloc>().add(AddMealEvent(meal: meal));
+
+    setState(() => _addedIds.add(sourceMeal.name));
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _addedIds.remove(sourceMeal.name));
+    });
+
+    final typeLabel = _mealTypeLabel(S.of(context), chosen);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white, size: 18),
+            SizedBox(width: 8.w),
+            Expanded(
+              child: Text(
+                "${sourceMeal.name} ($typeLabel) — ${sourceMeal.calories} kcal",
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF24AC8B),
+        behavior: SnackBarBehavior.floating,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
         duration: const Duration(seconds: 2),
       ),
     );
@@ -100,7 +231,7 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s     = S.of(context);
     final title = s.categoryName(widget.categoryName);
 
     return Scaffold(
@@ -115,30 +246,62 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: widget.images.isEmpty
-          ? Center(
+      body: BlocBuilder<CustomFoodBloc, CustomFoodState>(
+        builder: (context, customState) {
+          return BlocBuilder<MealBloc, MealState>(
+            builder: (context, mealState) {
+          final customFoods = customState is CustomFoodLoaded
+              ? customState.foods
+                  .where((f) => f.category == widget.categoryName)
+                  .toList()
+              : <CustomFood>[];
+
+          final customFoodNames =
+              customFoods.map((f) => f.name.toLowerCase()).toSet();
+          final uniqueMealsFromLog = <Meal>[];
+          if (mealState is MealLoaded) {
+            final seen = <String>{};
+            for (final m in mealState.meals) {
+              if (m.category == widget.categoryName && m.isCustom) {
+                final key = m.name.toLowerCase();
+                if (!customFoodNames.contains(key) && seen.add(key)) {
+                  uniqueMealsFromLog.add(m);
+                }
+              }
+            }
+          }
+
+          final assetCount = widget.images.length;
+          final totalCount =
+              assetCount + customFoods.length + uniqueMealsFromLog.length;
+
+          if (totalCount == 0) {
+            return Center(
               child: Text(
                 s.noFoodCategory,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-            )
-          : GridView.builder(
-              padding: EdgeInsets.all(16.w),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12.w,
-                mainAxisSpacing: 12.h,
-                childAspectRatio: 0.9,
-              ),
-              itemCount: widget.images.length,
-              itemBuilder: (context, index) {
-                final imagePath = widget.images[index];
-                final rawName =
-                    imagePath.split('/').last.split('.').first;
+            );
+          }
+
+          return GridView.builder(
+            padding: EdgeInsets.all(16.w),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
+              childAspectRatio: 0.9,
+            ),
+            itemCount: totalCount,
+            itemBuilder: (context, index) {
+              // Asset food tiles
+              if (index < assetCount) {
+                final imagePath   = widget.images[index];
+                final rawName     = imagePath.split('/').last.split('.').first;
                 final displayName = rawName.replaceAll('_', ' ');
-                final info = getFoodInfo(rawName);
-                final calories = info?.calories ?? 200;
-                final isAdded = _addedIds.contains(imagePath);
+                final info        = getFoodInfo(rawName);
+                final calories    = info?.calories ?? 200;
+                final isAdded     = _addedIds.contains(imagePath);
 
                 return GestureDetector(
                   onTap: () => _onFoodTap(context, imagePath),
@@ -157,8 +320,7 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color:
-                              Colors.black.withValues(alpha: 0.06),
+                          color: Colors.black.withValues(alpha: 0.06),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -184,9 +346,8 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
                                   errorBuilder: (_, __, ___) => Icon(
                                     Icons.fastfood_rounded,
                                     size: 48.h,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary,
+                                    color:
+                                        Theme.of(context).colorScheme.primary,
                                   ),
                                 ),
                         ),
@@ -203,8 +364,7 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
                                 .bodyMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color:
-                                      isAdded ? Colors.white : null,
+                                  color: isAdded ? Colors.white : null,
                                 ),
                           ),
                         ),
@@ -214,8 +374,7 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
                               horizontal: 10.w, vertical: 3.h),
                           decoration: BoxDecoration(
                             color: isAdded
-                                ? Colors.white
-                                    .withValues(alpha: 0.25)
+                                ? Colors.white.withValues(alpha: 0.25)
                                 : const Color(0xFF24AC8B)
                                     .withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20.r),
@@ -250,22 +409,264 @@ class _CategoryMealsPageState extends State<CategoryMealsPage> {
                     ),
                   ),
                 );
-              },
-            ),
+              }
+
+              // Custom food tiles (from library)
+              if (index < assetCount + customFoods.length) {
+              final food    = customFoods[index - assetCount];
+              final isAdded = _addedIds.contains(food.id);
+              final firstImg =
+                  widget.images.isNotEmpty ? widget.images.first : null;
+
+              return GestureDetector(
+                onTap: () => _onCustomFoodTap(context, food),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  decoration: BoxDecoration(
+                    color: isAdded
+                        ? const Color(0xFF24AC8B)
+                        : Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(18.r),
+                    border: Border.all(
+                      color: const Color(0xFFFF9A3C),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: isAdded
+                            ? Icon(
+                                Icons.check_circle_rounded,
+                                key: const ValueKey('check_c'),
+                                size: 52.h,
+                                color: Colors.white,
+                              )
+                            : (firstImg != null
+                                ? Image.asset(
+                                    firstImg,
+                                    key: ValueKey('img_${food.id}'),
+                                    height: 50.h,
+                                    width: 50.w,
+                                    errorBuilder: (_, __, ___) => Text(
+                                      '🍽️',
+                                      style: TextStyle(fontSize: 28.sp),
+                                    ),
+                                  )
+                                : Text(
+                                    '🍽️',
+                                    key: ValueKey('emoji_${food.id}'),
+                                    style: TextStyle(fontSize: 28.sp),
+                                  )),
+                      ),
+                      SizedBox(height: 6.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Text(
+                          food.name,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: isAdded ? Colors.white : null,
+                              ),
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.w, vertical: 3.h),
+                        decoration: BoxDecoration(
+                          color: isAdded
+                              ? Colors.white.withValues(alpha: 0.25)
+                              : const Color(0xFF24AC8B)
+                                  .withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          "${food.calories} kcal",
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isAdded
+                                ? Colors.white
+                                : const Color(0xFF24AC8B),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 3.h),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 7.w, vertical: 2.h),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Text(
+                          'Custom',
+                          style: TextStyle(
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+              } // custom food from library
+
+              // Meal log tiles (isCustom:true va kategoriya mos keladi)
+              final meal =
+                  uniqueMealsFromLog[index - assetCount - customFoods.length];
+              final isAddedMeal = _addedIds.contains(meal.name);
+              final firstImgMeal =
+                  widget.images.isNotEmpty ? widget.images.first : null;
+
+              return GestureDetector(
+                onTap: () => _onMealLogTap(context, meal),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  decoration: BoxDecoration(
+                    color: isAddedMeal
+                        ? const Color(0xFF24AC8B)
+                        : Theme.of(context).cardColor,
+                    borderRadius: BorderRadius.circular(18.r),
+                    border: Border.all(
+                      color: const Color(0xFFFF9A3C),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        child: isAddedMeal
+                            ? Icon(
+                                Icons.check_circle_rounded,
+                                key: const ValueKey('check_ml'),
+                                size: 52.h,
+                                color: Colors.white,
+                              )
+                            : (firstImgMeal != null
+                                ? Image.asset(
+                                    firstImgMeal,
+                                    key: ValueKey('img_ml_${meal.name}'),
+                                    height: 50.h,
+                                    width: 50.w,
+                                    errorBuilder: (_, __, ___) => Text(
+                                      '🍽️',
+                                      style: TextStyle(fontSize: 28.sp),
+                                    ),
+                                  )
+                                : Text(
+                                    '🍽️',
+                                    key: ValueKey('emoji_ml_${meal.name}'),
+                                    style: TextStyle(fontSize: 28.sp),
+                                  )),
+                      ),
+                      SizedBox(height: 6.h),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8.w),
+                        child: Text(
+                          meal.name,
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: isAddedMeal ? Colors.white : null,
+                              ),
+                        ),
+                      ),
+                      SizedBox(height: 4.h),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 10.w, vertical: 3.h),
+                        decoration: BoxDecoration(
+                          color: isAddedMeal
+                              ? Colors.white.withValues(alpha: 0.25)
+                              : const Color(0xFF24AC8B)
+                                  .withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        child: Text(
+                          "${meal.calories} kcal",
+                          style: TextStyle(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isAddedMeal
+                                ? Colors.white
+                                : const Color(0xFF24AC8B),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 3.h),
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 7.w, vertical: 2.h),
+                        decoration: BoxDecoration(
+                          color: Colors.orange.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(8.r),
+                        ),
+                        child: Text(
+                          'Custom',
+                          style: TextStyle(
+                            fontSize: 8.sp,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.orange,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+            }, // MealBloc builder
+          );
+        },
+      ),
     );
   }
 }
 
 // ── Meal Type tanlash bottom sheet ────────────────────────────────────────────
 class _MealTypePicker extends StatelessWidget {
-  final String foodName;
-  final int calories;
-  final String imagePath;
+  final String  foodName;
+  final int     calories;
+  final String? imagePath;
 
   const _MealTypePicker({
     required this.foodName,
     required this.calories,
-    required this.imagePath,
+    this.imagePath,
   });
 
   List<_TypeOption> _buildTypes(S s) => [
@@ -277,7 +678,7 @@ class _MealTypePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = S.of(context);
+    final s     = S.of(context);
     final types = _buildTypes(s);
     return Container(
       decoration: BoxDecoration(
@@ -288,7 +689,6 @@ class _MealTypePicker extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Handle
           Container(
             width: 40.w,
             height: 4.h,
@@ -302,34 +702,19 @@ class _MealTypePicker extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
 
-          // Ovqat nomi + kaloriya
           Row(
             children: [
-              // Rasm
               ClipRRect(
                 borderRadius: BorderRadius.circular(12.r),
-                child: Image.asset(
-                  imagePath,
-                  width: 52.w,
-                  height: 52.h,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    width: 52.w,
-                    height: 52.h,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primary
-                          .withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Icon(
-                      Icons.fastfood_rounded,
-                      color: Theme.of(context).colorScheme.primary,
-                      size: 28,
-                    ),
-                  ),
-                ),
+                child: imagePath != null
+                    ? Image.asset(
+                        imagePath!,
+                        width: 52.w,
+                        height: 52.h,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => _placeholder(context),
+                      )
+                    : _placeholder(context),
               ),
               SizedBox(width: 12.w),
               Expanded(
@@ -363,18 +748,14 @@ class _MealTypePicker extends StatelessWidget {
 
           Text(
             s.addToMeal,
-            style: Theme.of(context)
-                .textTheme
-                .titleSmall
-                ?.copyWith(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.6)),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.6)),
           ),
           SizedBox(height: 14.h),
 
-          // 2x2 Grid
           Row(
             children: [
               Expanded(child: _typeCard(context, types[0])),
@@ -392,6 +773,22 @@ class _MealTypePicker extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
         ],
+      ),
+    );
+  }
+
+  Widget _placeholder(BuildContext context) {
+    return Container(
+      width: 52.w,
+      height: 52.h,
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12.r),
+      ),
+      child: Icon(
+        Icons.restaurant_rounded,
+        color: Theme.of(context).colorScheme.primary,
+        size: 28,
       ),
     );
   }
